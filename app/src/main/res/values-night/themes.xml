@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base ini WAJIB ada karena dipanggil di mana-mana -->
+    <style name="Base.Theme.MyAttendance" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#6200EE</item>
+        <item name="colorPrimaryVariant">#3700B3</item>
+        <item name="colorSecondary">#03DAC5</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+
+    <!-- Theme utama yang dipakai di Manifest -->
+    <style name="Theme.MyAttendance" parent="Base.Theme.MyAttendance" />
+    <style name="CircleImage" parent="Widget.MaterialComponents.ShapeableImageView">
+        <item name="shapeAppearanceOverlay">@style/ShapeOverlay.Circle</item>
+    </style>
+
+    <style name="ShapeOverlay.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

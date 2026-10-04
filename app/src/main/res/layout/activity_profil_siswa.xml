@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scrollProfil"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F0F0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- HEADER -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvNamaProfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nama Siswa"
+                    android:textSize="20sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvNisnProfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NISN : -"/>
+
+                <TextView
+                    android:id="@+id/tvJkProfil"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jenis Kelamin : -"/>
+
+                <Button
+                    android:id="@+id/btnUbahKelas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PROFIL"
+                    android:layout_gravity="end"
+                    android:backgroundTint="#009688"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- TOMBOL -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <Button
+                android:id="@+id/btnLihatNilai"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:text="LIHAT NILAI"
+                android:backgroundTint="#009688"/>
+
+            <Button
+                android:id="@+id/btnLihatAbsen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="LIHAT ABSENSI"
+                android:backgroundTint="#009688"/>
+        </LinearLayout>
+
+        <!-- TABEL ABSEN -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INFORMASI KEHADIRAN"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TableLayout
+                    android:id="@+id/tabelAbsen"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="*">
+                    <TableRow android:background="#E0E0E0">
+                        <TextView android:text="KETERANGAN" android:padding="8dp" android:textStyle="bold"/>
+                        <TextView android:text="JUMLAH" android:padding="8dp" android:textStyle="bold" android:gravity="center"/>
+                        <TextView android:text="%" android:padding="8dp" android:textStyle="bold" android:gravity="center"/>
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- TABEL NILAI -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INFORMASI NILAI"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp"/>
+
+                <TableLayout
+                    android:id="@+id/tabelNilai"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stretchColumns="*">
+                    <TableRow android:background="#E0E0E0">
+                        <TextView android:text="KETERANGAN NILAI" android:padding="8dp" android:textStyle="bold"/>
+                        <TextView android:text="NILAI" android:padding="8dp" android:textStyle="bold" android:gravity="center"/>
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>

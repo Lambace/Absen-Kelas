@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F0F0F0">
+
+    <!-- HEADER -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#00A896"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:elevation="4dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="16dp">
+
+        <ImageView
+            android:id="@+id/btnBackDetail"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="4dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:contentDescription="Kembali"
+            app:tint="#FFFFFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detail Kelas"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="6dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvNamaDetail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@id/layoutInfoKanan"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="8dp"
+                            android:text="XI TPM 2"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="#009688"
+                            android:maxLines="1"
+                            android:ellipsize="end"/>
+
+                        <LinearLayout
+                            android:id="@+id/layoutInfoKanan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                                android:src="@android:drawable/ic_menu_myplaces" app:tint="#009688"/>
+                            <TextView android:id="@+id/tvSiswaDetail" android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:text="21"
+                                android:layout_marginStart="4dp" android:layout_marginEnd="12dp"
+                                android:textStyle="bold"/>
+
+                            <ImageView android:layout_width="18dp" android:layout_height="18dp"
+                                android:src="@android:drawable/ic_menu_agenda" app:tint="#009688"/>
+                            <TextView android:id="@+id/tvAbsenDetail" android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:text="5"
+                                android:layout_marginStart="4dp" android:textStyle="bold"/>
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                    <TextView android:id="@+id/tvTanggalDetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
+                    <TextView android:id="@+id/tvInchargeDetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
+
+                    <!-- 3 TOMBOL SAJA - Laporan dihapus -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:weightSum="3"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="14dp">
+
+                        <LinearLayout android:id="@+id/btnStudentsDetail" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/ic_menu_myplaces" app:tint="#009688"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Siswa" android:textSize="12sp" android:textColor="#616161"/>
+                        </LinearLayout>
+
+                        <LinearLayout android:id="@+id/btnAttendanceDetail" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/ic_menu_my_calendar" app:tint="#009688"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Absensi" android:textSize="12sp" android:textColor="#616161"/>
+                        </LinearLayout>
+
+                        <LinearLayout android:id="@+id/btnExamsDetail" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/ic_menu_edit" app:tint="#009688"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nilai" android:textSize="12sp" android:textColor="#616161"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

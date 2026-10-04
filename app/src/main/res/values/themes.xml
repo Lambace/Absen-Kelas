@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.AbsensiKelas" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Pakai warna dari colors.xml, bukan ungu -->
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorPrimaryVariant">@color/btn_teal</item>
+        <item name="colorSecondary">@color/primary_green</item>
+        <item name="colorOnPrimary">@color/text_white</item>
+
+        <!-- Background aplikasi -->
+        <item name="android:colorBackground">@color/bg_gray</item>
+        <item name="android:windowBackground">@color/bg_gray</item>
+        <item name="android:statusBarColor">@color/primary_green</item>
+        <item name="android:navigationBarColor">@color/bg_gray</item>
+        <item name="android:textColorPrimary">@color/text_black</item>
+    </style>
+
+    <style name="Theme.AbsensiKelas" parent="Base.Theme.AbsensiKelas" />
+
+    <style name="CircleImage" parent="Widget.MaterialComponents.ShapeableImageView">
+        <item name="shapeAppearanceOverlay">@style/ShapeOverlay.Circle</item>
+    </style>
+
+    <style name="ShapeOverlay.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+</resources>

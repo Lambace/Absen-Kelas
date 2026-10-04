@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F9FAFB">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_header_teal"
+        android:orientation="vertical"
+        android:paddingTop="32dp"
+        android:paddingBottom="28dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <TextView
+            android:id="@+id/tvJudul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat Absensi"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Detail kehadiran siswa"
+            android:textColor="#B2DFDB"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDownloadAbsensi"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_margin="12dp"
+        android:text="DOWNLOAD REKAP PDF"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#009688"
+        app:cornerRadius="12dp"
+        app:icon="@android:drawable/ic_menu_save"
+        app:iconTint="#FFFFFF"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTanggal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="8dp" />
+
+</LinearLayout>

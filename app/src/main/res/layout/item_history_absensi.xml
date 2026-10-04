@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- TANGGAL DI ATAS -->
+            <TextView
+                android:id="@+id/tvTanggal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="02-05-2026"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#424242"/>
+
+            <!-- HARI DI BAWAH -->
+            <TextView
+                android:id="@+id/tvHari"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sabtu"
+                android:textSize="13sp"
+                android:textColor="#757575"
+                android:layout_marginTop="2dp"/>
+
+        </LinearLayout>
+
+        <!-- EDIT -->
+        <LinearLayout
+            android:id="@+id/btnEdit"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_edit"
+                app:tint="#009688"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit"
+                android:textSize="11sp"
+                android:textColor="#616161"/>
+        </LinearLayout>
+
+        <!-- DELETE -->
+        <LinearLayout
+            android:id="@+id/btnDelete"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_delete"
+                app:tint="#009688"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete"
+                android:textSize="11sp"
+                android:textColor="#616161"/>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

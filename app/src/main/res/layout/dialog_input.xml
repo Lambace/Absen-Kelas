@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/tvTitleDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#2D3436"
+        android:layout_marginBottom="20dp"/>
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivPreviewFoto"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center"
+        android:src="@mipmap/ic_launcher_round"
+        app:shapeAppearanceOverlay="@style/CircleImage"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnPilihFoto"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Pilih Foto"
+        android:layout_marginBottom="20dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="Nama Lengkap">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etInputUtama"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btnSimpanDialog"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="24dp"
+        android:text="Simpan"
+        app:cornerRadius="12dp"
+        android:backgroundTint="#00A896"/>
+
+</LinearLayout>

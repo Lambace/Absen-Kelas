@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F0F0F0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#00A896"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp">
+
+        <TextView
+            android:id="@+id/tvJudulKelas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Absensi Kelas"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvTanggalAbsen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tanggal: 05-05-2026"
+            android:textStyle="bold"
+            android:textColor="#212121"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDownloadKelas"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="DOWNLOAD"
+            android:textSize="12sp"
+            app:backgroundTint="#009688"
+            app:cornerRadius="8dp"
+            app:icon="@android:drawable/ic_menu_save"
+            app:iconTint="#FFFFFF"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAbsensiKelas"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="8dp"/>
+
+</LinearLayout>

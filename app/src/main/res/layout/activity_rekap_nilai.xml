@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#009688">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvJudulRekap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/btnExportPdf"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="Rekap Nilai"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExportPdf"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="4dp"
+                android:text="Download"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                android:paddingStart="10dp"
+                android:paddingEnd="12dp"
+                android:minWidth="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:icon="@android:drawable/ic_menu_save"
+                app:iconTint="#E91E63"
+                app:iconSize="16dp"
+                app:iconPadding="6dp"
+                app:cornerRadius="16dp"
+                android:backgroundTint="#FFFFFF"
+                android:textColor="#009688"/>
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="KKM:"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"/>
+
+        <EditText
+            android:id="@+id/etKKM"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:inputType="number"
+            android:hint="--"
+            android:gravity="center"
+            android:background="@android:drawable/edit_text"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+    <!-- PERUBAHAN DI SINI: Tambah ScrollView untuk scroll vertikal -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="false">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
+
+            <TableLayout
+                android:id="@+id/tabelRekap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                android:padding="8dp"/>
+
+        </HorizontalScrollView>
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#009688"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tvDialogKeterangan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UH 1 Matematika"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvDialogTanggal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Diinput: 05-05-2026"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- Body -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="UBAH NILAI"
+                android:textSize="12sp"
+                android:textColor="#666"
+                android:letterSpacing="0.1"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="16dp">
+
+                <ImageButton
+                    android:id="@+id/btnMinus"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_media_previous"
+                    android:rotation="270"
+                    android:tint="#009688"/>
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNilaiEdit"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:text="85"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:textColor="#009688"
+                    android:background="@null"/>
+
+                <ImageButton
+                    android:id="@+id/btnPlus"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_media_next"
+                    android:rotation="270"
+                    android:tint="#009688"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Footer -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:padding="12dp">
+
+            <Button
+                android:id="@+id/btnBatal"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BATAL"
+                android:textColor="#666"/>
+
+            <Button
+                android:id="@+id/btnSimpan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="SIMPAN"
+                android:backgroundTint="#009688"/>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

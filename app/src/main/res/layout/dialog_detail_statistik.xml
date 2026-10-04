@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat Kehadiran"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TableLayout
+            android:id="@+id/tableAbsensi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0">
+            <TableRow>
+                <TextView android:text="Tanggal" android:textStyle="bold" android:padding="8dp"/>
+                <TextView android:text="Status" android:textStyle="bold" android:padding="8dp" android:gravity="center"/>
+            </TableRow>
+        </TableLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#DDDDDD"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat Nilai"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TableLayout
+            android:id="@+id/tableNilai"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0">
+            <TableRow>
+                <TextView android:text="Tanggal" android:textStyle="bold" android:padding="8dp"/>
+                <TextView android:text="Nilai" android:textStyle="bold" android:padding="8dp" android:gravity="center"/>
+            </TableRow>
+        </TableLayout>
+
+    </LinearLayout>
+</ScrollView>
