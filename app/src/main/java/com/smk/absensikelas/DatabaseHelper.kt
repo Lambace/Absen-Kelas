@@ -365,13 +365,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
         return list
     }
 
-    fun getAllOrangTua(): List<Map<String, String>> {
+        fun getAllOrangTua(): List<Map<String, String>> {
         val list = mutableListOf<Map<String, String>>()
+        // Menggunakan LEFT JOIN agar data dengan id_siswa 0 (umum) tetap terbaca
         val c = readableDatabase.rawQuery("""
-            SELECT o.id, o.id_siswa, s.nama_siswa, IFNULL(s.nis,''), o.nama, IFNULL(o.no_hp,''), o.status
-            FROM orang_tua o JOIN siswa s ON o.id_siswa = s.id
-            ORDER BY s.nama_siswa, o.status
+            SELECT o.id, o.id_siswa, IFNULL(s.nama_siswa, 'Kontak Umum'), IFNULL(s.nis,''), o.nama, IFNULL(o.no_hp,''), o.status
+            FROM orang_tua o 
+            LEFT JOIN siswa s ON o.id_siswa = s.id
+            ORDER BY o.status DESC, o.nama ASC
         """, null)
+        
         while (c.moveToNext()) {
             list.add(mapOf(
                 "id" to c.getInt(0).toString(),
