@@ -638,4 +638,22 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
         return list
     }
 
+        // Ambil data orang tua yang belum di-assign ke siswa manapun (id_siswa = 0)
+    fun getOrangTuaGlobal(): List<OrangTuaModel> {
+        val list = mutableListOf<OrangTuaModel>()
+        val c = readableDatabase.rawQuery(
+            "SELECT id, id_siswa, nama, no_hp, status FROM orang_tua WHERE id_siswa = 0", 
+            null
+        )
+        while (c.moveToNext()) list.add(mapRowKeOrangTua(c))
+        c.close()
+        return list
+    }
+
+    // Menautkan orang tua yang ada di database ke siswa tertentu
+    fun linkOrangTuaKeSiswa(idOrangTua: Int, idSiswaBaru: Int): Int {
+        val cv = ContentValues().apply { put("id_siswa", idSiswaBaru) }
+        return writableDatabase.update("orang_tua", cv, "id=?", arrayOf(idOrangTua.toString()))
+    }
+    
 }
