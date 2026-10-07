@@ -117,6 +117,55 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+            <!-- CARD DATA ORANG TUA -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KONTAK ORANG TUA / WALI"
+                    android:textStyle="bold"
+                    android:textColor="#009688"
+                    android:layout_marginBottom="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvInfoAyah"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ayah: - (-)"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvInfoIbu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ibu: - (-)"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="12dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAturOrangTua"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ATUR / HUBUNGKAN KONTAK"
+                    android:textColor="#009688"
+                    app:strokeColor="#009688"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        
         <!-- TABEL NILAI -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
