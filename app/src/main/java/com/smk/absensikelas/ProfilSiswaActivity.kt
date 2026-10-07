@@ -8,6 +8,9 @@ import android.view.Gravity
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.smk.absensikelas.R
+    private lateinit var tvInfoAyah: TextView
+    private lateinit var tvInfoIbu: TextView
+    private lateinit var btnAturOrangTua: Button
 
 class ProfilSiswaActivity : androidx.appcompat.app.AppCompatActivity() {
 
