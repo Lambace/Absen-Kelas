@@ -111,6 +111,12 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
                 .putExtra("tahun_ajaran", parts[0])
                 .putExtra("semester", parts.getOrElse(1){"Ganjil"}))
         }
+        findViewById<CardView>(R.id.cardInputOrangTua).setOnClickListener {
+            val parts = tahunAjaranTerpilih.split(" - ")
+            startActivity(Intent(this, InputOrangTuaActivity::class.java)
+                .putExtra("tahun_ajaran", parts[0])
+                .putExtra("semester", parts.getOrElse(1){"Ganjil"}))
+        }
     }
 
     override fun onResume() {
