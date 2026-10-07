@@ -27,6 +27,7 @@
         <activity android:name=".DetailKelasActivity" />
         <activity android:name=".HistoryAbsensiActivity" />
         <activity android:name=".InputNilaiActivity" />
+        <activity android:name=".InputOrangTuaActivity" />
         <activity android:name=".InputSiswaActivity" />
         <activity android:name=".ProfilSiswaActivity" />
         <activity android:name=".RekapNilaiActivity" />

@@ -11,10 +11,19 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db", null, 14) {
+class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db", null, 16) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE guru (id INTEGER PRIMARY KEY AUTOINCREMENT, nama TEXT, foto TEXT)")
+        db.execSQL("""
+            CREATE TABLE orang_tua (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_siswa INTEGER,
+                nama TEXT NOT NULL,
+                no_hp TEXT,
+                status TEXT DEFAULT 'Ayah'
+            )
+        """)
         db.execSQL("CREATE TABLE kelas (id INTEGER PRIMARY KEY AUTOINCREMENT, nama_kelas TEXT, jurusan TEXT, wali_kelas TEXT, nomor_wa_wali TEXT, semester TEXT DEFAULT 'Ganjil')")
         // PERBAIKAN: hapus UNIQUE supaya NIS boleh kosong/duplikat
         db.execSQL("CREATE TABLE siswa (id INTEGER PRIMARY KEY AUTOINCREMENT, id_kelas INTEGER, nama_siswa TEXT, nis TEXT, jenis_kelamin TEXT)")
@@ -80,6 +89,74 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
                 Log.d("DB_UPGRADE", "Migrasi v14 sukses")
             } catch (e: Exception) {
                 Log.e("DB_UPGRADE", "Migrasi gagal", e)
+            } finally {
+                db.endTransaction()
+            }
+        }
+
+        // v15: tabel baru untuk data orang tua/wali siswa
+        if (oldVersion < 15) {
+            try {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS orang_tua (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        id_siswa INTEGER,
+                        nama TEXT NOT NULL,
+                        no_hp TEXT,
+                        status TEXT DEFAULT 'Ayah'
+                    )
+                """)
+                Log.d("DB_UPGRADE", "Migrasi v15 sukses: tabel orang_tua dibuat")
+            } catch (e: Exception) {
+                Log.e("DB_UPGRADE", "Gagal buat tabel orang_tua", e)
+            }
+        }
+
+        // v16: sederhanakan data orang tua -> cukup nama, no HP, dan status (Ayah/Ibu/Wali)
+        if (oldVersion < 16) {
+            try {
+                db.beginTransaction()
+                db.execSQL("DROP TABLE IF EXISTS orang_tua_new")
+                db.execSQL("""
+                    CREATE TABLE orang_tua_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        id_siswa INTEGER,
+                        nama TEXT NOT NULL,
+                        no_hp TEXT,
+                        status TEXT DEFAULT 'Ayah'
+                    )
+                """)
+                // migrasi data lama (jika ada): pecah kolom ayah/ibu/wali menjadi baris terpisah
+                val punyaDataLama = try {
+                    val c = db.rawQuery(
+                        "SELECT id_siswa, nama_ayah, telpon_ayah, nama_ibu, telpon_ibu, nama_wali, telpon_wali FROM orang_tua",
+                        null
+                    )
+                    while (c.moveToNext()) {
+                        fun tambahBaris(namaIdx: Int, hpIdx: Int, status: String) {
+                            val nm = c.getString(namaIdx)?.trim().orEmpty()
+                            if (nm.isNotEmpty()) {
+                                val cvOld = ContentValues()
+                                cvOld.put("id_siswa", c.getInt(0))
+                                cvOld.put("nama", nm)
+                                cvOld.put("no_hp", c.getString(hpIdx)?.trim().orEmpty())
+                                cvOld.put("status", status)
+                                db.insert("orang_tua_new", null, cvOld)
+                            }
+                        }
+                        tambahBaris(1, 2, "Ayah")
+                        tambahBaris(3, 4, "Ibu")
+                        tambahBaris(5, 6, "Wali")
+                    }
+                    c.close()
+                    true
+                } catch (e: Exception) { false }
+                db.execSQL("DROP TABLE IF EXISTS orang_tua")
+                db.execSQL("ALTER TABLE orang_tua_new RENAME TO orang_tua")
+                db.setTransactionSuccessful()
+                Log.d("DB_UPGRADE", "Migrasi v16 sukses: struktur tabel orang_tua disederhanakan (data lama ikut dimigrasi: $punyaDataLama)")
+            } catch (e: Exception) {
+                Log.e("DB_UPGRADE", "Gagal migrasi v16 tabel orang_tua", e)
             } finally {
                 db.endTransaction()
             }
@@ -256,6 +333,78 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
         return ada
     }
 
+    // ---- ORANG TUA / WALI (nama, no HP, status) ----
+    fun insertOrangTua(data: OrangTuaModel): Long {
+        val cv = ContentValues().apply {
+            put("id_siswa", data.idSiswa)
+            put("nama", data.nama)
+            put("no_hp", data.noHp)
+            put("status", data.status)
+        }
+        return writableDatabase.insert("orang_tua", null, cv)
+    }
+
+    fun updateOrangTua(id: Int, data: OrangTuaModel): Int {
+        val cv = ContentValues().apply {
+            put("id_siswa", data.idSiswa)
+            put("nama", data.nama)
+            put("no_hp", data.noHp)
+            put("status", data.status)
+        }
+        return writableDatabase.update("orang_tua", cv, "id=?", arrayOf(id.toString()))
+    }
+
+    fun getOrangTuaBySiswa(idSiswa: Int): List<OrangTuaModel> {
+        val list = mutableListOf<OrangTuaModel>()
+        val c = readableDatabase.rawQuery(
+            "SELECT id, id_siswa, nama, no_hp, status FROM orang_tua WHERE id_siswa=? ORDER BY status",
+            arrayOf(idSiswa.toString())
+        )
+        while (c.moveToNext()) list.add(mapRowKeOrangTua(c))
+        c.close()
+        return list
+    }
+
+    fun getAllOrangTua(): List<Map<String, String>> {
+        val list = mutableListOf<Map<String, String>>()
+        val c = readableDatabase.rawQuery("""
+            SELECT o.id, o.id_siswa, s.nama_siswa, IFNULL(s.nis,''), o.nama, IFNULL(o.no_hp,''), o.status
+            FROM orang_tua o JOIN siswa s ON o.id_siswa = s.id
+            ORDER BY s.nama_siswa, o.status
+        """, null)
+        while (c.moveToNext()) {
+            list.add(mapOf(
+                "id" to c.getInt(0).toString(),
+                "id_siswa" to c.getInt(1).toString(),
+                "nama_siswa" to c.getString(2),
+                "nis" to c.getString(3),
+                "nama" to c.getString(4),
+                "no_hp" to c.getString(5),
+                "status" to c.getString(6)
+            ))
+        }
+        c.close()
+        return list
+    }
+
+    fun deleteOrangTuaById(id: Int): Int {
+        return writableDatabase.delete("orang_tua", "id=?", arrayOf(id.toString()))
+    }
+
+    fun deleteOrangTuaBySiswa(idSiswa: Int): Int {
+        return writableDatabase.delete("orang_tua", "id_siswa=?", arrayOf(idSiswa.toString()))
+    }
+
+    private fun mapRowKeOrangTua(c: android.database.Cursor): OrangTuaModel {
+        return OrangTuaModel(
+            id = c.getInt(0),
+            idSiswa = c.getInt(1),
+            nama = c.getString(2) ?: "",
+            noHp = c.getString(3) ?: "",
+            status = c.getString(4) ?: "Ayah"
+        )
+    }
+
     fun bulkInsertSiswa(data: List<ContentValues>) {
         val db = writableDatabase; db.beginTransaction()
         try { data.forEach { db.insert("siswa", null, it) }; db.setTransactionSuccessful() } finally { db.endTransaction() }
@@ -313,7 +462,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
 
     fun insertOrUpdateNilai(idSiswa: Int, mapel: String, tahun: String, nilai: Double, keterangan: String) {
         val db = writableDatabase
-        val tgl = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale("id")).format(Date())
+        val tgl = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
         val cv = ContentValues().apply {
             put("id_siswa", idSiswa); put("mapel", mapel); put("nilai", nilai.toInt())
             put("tanggal", tgl); put("keterangan", keterangan.ifBlank { mapel })

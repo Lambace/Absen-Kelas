@@ -56,3 +56,12 @@ data class SiswaStatistikModel(
     val persentaseHadir: Float,
     val rataNilai: Double
 )
+
+// 6. Data orang tua / wali siswa, cocok dengan tabel 'orang_tua'
+data class OrangTuaModel(
+    val id: Int = 0,
+    val idSiswa: Int,
+    val nama: String = "",
+    val noHp: String = "",
+    val status: String = "Ayah" // Ayah / Ibu / Wali
+)
