@@ -1,6 +1,5 @@
 package com.smk.absensikelas
 
-import com.smk.absensikelas.R
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -45,6 +44,9 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
     private lateinit var btnCloseSearch: MaterialButton
     private lateinit var searchAdapter: SearchAdapter
 
+    // === FITUR UPDATE ===
+    private lateinit var updateManager: UpdateManager
+
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
@@ -71,6 +73,10 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
 
         db = DatabaseHelper(this)
         prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+
+        // === INISIALISASI UPDATE MANAGER ===
+        updateManager = UpdateManager(this)
+
         tvNamaGuru = findViewById(R.id.tvNamaGuru)
         ivFotoGuru = findViewById(R.id.ivFotoGuru)
         rvKelas = findViewById(R.id.rvKelas)
@@ -90,6 +96,9 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
         loadDataKelas()
         setupSearch()
         setupBackupReset()
+
+        // === PANGGIL FUNGSI UPDATE ===
+        setupUpdate()
 
         findViewById<CardView>(R.id.cardAbsensiHarian).setOnClickListener {
             val parts = tahunAjaranTerpilih.split(" - ")
@@ -117,6 +126,36 @@ class MainActivity : androidx.appcompat.app.AppCompatActivity() {
         super.onResume()
         loadDataGuru()
         loadDataKelas()
+    }
+
+    // === FITUR UPDATE: SETUP TOMBOL & LOGIKA ===
+    private fun setupUpdate() {
+        val btnCekUpdate = findViewById<MaterialButton>(R.id.btnCekUpdate)
+        btnCekUpdate.setOnClickListener {
+            Toast.makeText(this, "Mengecek versi terbaru di GitHub...", Toast.LENGTH_SHORT).show()
+            updateManager.cekUpdate { isNew, newVersion, downloadUrl, fileName ->
+                if (isNew) {
+                    AlertDialog.Builder(this)
+                        .setTitle("Update Tersedia! 🚀")
+                        .setMessage("Versi terbaru ($newVersion) sudah tersedia. Unduh dan instal sekarang?")
+                        .setPositiveButton("Update Sekarang") { _, _ ->
+                            updateManager.downloadDanInstall(downloadUrl, fileName)
+                        }
+                        .setNegativeButton("Nanti", null)
+                        .show()
+                } else {
+                    Toast.makeText(this, "Aplikasi Anda sudah versi terbaru!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    // === MENCEGAH MEMORY LEAK SAAT APLIKASI DITUTUP ===
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::updateManager.isInitialized) {
+            updateManager.unregister()
+        }
     }
 
     private fun setupSearch() {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp"/>
+
+    <Spinner
+        android:id="@+id/spinnerStatusDialog"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/etNamaDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nama Orang Tua"
+        android:inputType="textPersonName|textCapWords"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/etNoHpDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nomor WhatsApp (cth: 6281...)"
+        android:inputType="phone"/>
+</LinearLayout>

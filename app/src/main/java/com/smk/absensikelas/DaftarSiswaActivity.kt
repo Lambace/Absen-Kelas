@@ -34,21 +34,17 @@ class DaftarSiswaActivity : AppCompatActivity() {
 
         val tvJudulSiswa = findViewById<TextView>(R.id.tvJudulSiswa)
         val rvSiswa = findViewById<RecyclerView>(R.id.rvSiswa)
-
-        // Inisialisasi tombol back yang baru kita tambahkan ID-nya di XML
         val btnBack = findViewById<ImageView>(R.id.btnBack)
 
         tvJudulSiswa.text = "$namaKelas : Siswa"
         rvSiswa.layoutManager = LinearLayoutManager(this)
 
-        // Aksi klik untuk tombol kembali secara aman
         btnBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
         adapter = SiswaAdapter(
             onEditClick = { s ->
-                // === POPUP EDIT LENGKAP ===
                 val context = this
                 val layout = LinearLayout(context).apply {
                     orientation = LinearLayout.VERTICAL
@@ -97,12 +93,14 @@ class DaftarSiswaActivity : AppCompatActivity() {
             onDeleteClick = { s ->
                 AlertDialog.Builder(this)
                     .setTitle("Hapus Siswa")
-                    .setMessage("Hapus ${s.nama}? Data absensi & nilai akan ikut terhapus.")
+                    .setMessage("Hapus ${s.nama}? Data absensi, nilai, & orang tua akan ikut terhapus.")
                     .setPositiveButton("Hapus") { _, _ ->
                         db.writableDatabase.beginTransaction()
                         try {
                             db.writableDatabase.execSQL("DELETE FROM absensi WHERE id_siswa=?", arrayOf(s.id.toString()))
                             db.writableDatabase.execSQL("DELETE FROM nilai WHERE id_siswa=?", arrayOf(s.id.toString()))
+                            // TAMBAHAN: Hapus juga data orang tua terkait siswa ini
+                            db.writableDatabase.execSQL("DELETE FROM orang_tua WHERE id_siswa=?", arrayOf(s.id.toString()))
                             db.writableDatabase.execSQL("DELETE FROM siswa WHERE id=?", arrayOf(s.id.toString()))
                             db.writableDatabase.setTransactionSuccessful()
                         } finally {
@@ -115,34 +113,8 @@ class DaftarSiswaActivity : AppCompatActivity() {
                     .show()
             },
             onWaClick = { s ->
-                val telp = db.getTelpWaliByKelas(idKelas)
-                if (telp.isNotEmpty()) {
-                    val namaGuru = db.getGuru()?.get("nama") ?: "Agussalim Tajuddin"
-                    val mapel = getSharedPreferences("app_prefs", MODE_PRIVATE)
-                        .getString("mapel_guru", "Matematika") ?: "Matematika"
-
-                    val (alpha, bolos) = db.getRekapAlphaBolos(s.id)
-                    val nisTampil = s.nis?.ifEmpty { "-" } ?: "-"
-
-                    val pesan = """
-            Semangat Pagi Bapak/Ibu Wali Kelas hebat. Saya $namaGuru Guru $mapel, Menginformasikan Bahwa Ananda :
-
-            Nama        : ${s.nama}
-            Nis         : $nisTampil
-            Kelas       : $namaKelas
-
-            Telah tercatat Alpha ${alpha}X dan Bolos ${bolos}X. Mohon agar Siswa tersebut diberi perhatian. Terima Kasih, Dikirim Otomatis Oleh Sistem ABSESNSI SISWA !!.
-        """.trimIndent()
-
-                    val nomor = telp.replace(Regex("[^0-9]"), "").let {
-                        if (it.startsWith("0")) "62${it.substring(1)}" else it
-                    }
-                    val url = "https://wa.me/$nomor?text=${URLEncoder.encode(pesan, "UTF-8")}"
-                    val waIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                    startActivity(waIntent)
-                } else {
-                    Toast.makeText(this, "Nomor WA wali kelas belum diisi", Toast.LENGTH_SHORT).show()
-                }
+                // === LOGIKA BARU: TAMPILKAN DIALOG PILIHAN PENERIMA ===
+                tampilkanPilihanPenerimaWa(s)
             },
             enableAlert = true,
             showManageButtons = true
@@ -168,5 +140,103 @@ class DaftarSiswaActivity : AppCompatActivity() {
         }
         adapter.submitList(data)
         tvJumlahSiswa.text = data.size.toString()
+    }
+
+    // =========================================================
+    // === FITUR BARU: PILIH PENERIMA LAPORAN (WALI KELAS / ORANG TUA) ===
+    // =========================================================
+
+    private fun tampilkanPilihanPenerimaWa(s: SiswaModel) {
+        val (alpha, bolos) = db.getRekapAlphaBolos(s.id)
+
+        val penerimaLabels = mutableListOf<String>()
+        val penerimaNomor = mutableListOf<String>()
+        val penerimaTipe = mutableListOf<String>()
+
+        // 1. Nomor Wali Kelas (perilaku lama)
+        val telpWaliKelas = db.getTelpWaliByKelas(idKelas).replace(Regex("[^0-9]"), "").let {
+            if (it.startsWith("0")) "62${it.substring(1)}" else it
+        }
+        if (telpWaliKelas.isNotEmpty()) {
+            penerimaLabels.add("Wali Kelas")
+            penerimaNomor.add(telpWaliKelas)
+            penerimaTipe.add("WALI_KELAS")
+        }
+
+        // 2. Nomor Orang Tua / Wali Murid (fitur baru)
+        db.getOrangTuaBySiswa(s.id).forEach { ot ->
+            val nomor = ot.noHp.replace(Regex("[^0-9]"), "").let {
+                if (it.startsWith("0")) "62${it.substring(1)}" else it
+            }
+            if (nomor.isNotEmpty()) {
+                penerimaLabels.add("${ot.status} - ${ot.nama}")
+                penerimaNomor.add(nomor)
+                penerimaTipe.add(ot.status)
+            }
+        }
+
+        if (penerimaNomor.isEmpty()) {
+            Toast.makeText(this, "Nomor WA wali kelas & orang tua belum diisi", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Jika hanya 1 penerima, langsung kirim tanpa dialog
+        if (penerimaNomor.size == 1) {
+            bukaWhatsApp(penerimaNomor[0], buatPesanLaporan(s, penerimaTipe[0], alpha, bolos))
+            return
+        }
+
+        // Jika lebih dari 1, tampilkan dialog pilihan penerima
+        AlertDialog.Builder(this)
+            .setTitle("Kirim laporan ${s.nama} ke:")
+            .setItems(penerimaLabels.toTypedArray()) { _, which ->
+                bukaWhatsApp(penerimaNomor[which], buatPesanLaporan(s, penerimaTipe[which], alpha, bolos))
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
+    private fun buatPesanLaporan(s: SiswaModel, tipePenerima: String, alpha: Int, bolos: Int): String {
+        val nisTampil = s.nis?.ifEmpty { "-" } ?: "-"
+        return if (tipePenerima == "WALI_KELAS") {
+            // Pesan lama untuk wali kelas (tidak diubah)
+            val namaGuru = db.getGuru()?.get("nama") ?: "Agussalim Tajuddin"
+            val mapel = getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getString("mapel_guru", "Matematika") ?: "Matematika"
+            """
+Semangat Pagi Bapak/Ibu Wali Kelas hebat. Saya $namaGuru Guru $mapel, Menginformasikan Bahwa Ananda :
+
+Nama        : ${s.nama}
+Nis         : $nisTampil
+Kelas       : $namaKelas
+
+Telah tercatat Alpha ${alpha}X dan Bolos ${bolos}X. Mohon agar Siswa tersebut diberi perhatian. Terima Kasih, Dikirim Otomatis Oleh Sistem ABSESNSI SISWA !!.
+            """.trimIndent()
+        } else {
+            // Pesan baru khusus untuk orang tua: rekap kehadiran + rata-rata nilai
+            val stats = db.getStatistikSiswa(s.id)
+            val semuaNilai = db.getSemuaNilai(s.id)
+            val rata = if (semuaNilai.isNotEmpty()) semuaNilai.average().toInt() else 0
+            """
+Yth. Bapak/Ibu (${tipePenerima}) dari ananda ${s.nama}, Kelas $namaKelas.
+Berikut kami sampaikan laporan kehadiran dan nilai ananda:
+
+- Hadir : ${stats["hadir"] ?: 0}x
+- Izin : ${stats["izin"] ?: 0}x
+- Sakit : ${stats["sakit"] ?: 0}x
+- Alpha : ${stats["alpha"] ?: 0}x
+- Bolos : ${stats["bolos"] ?: 0}x
+- Rata-rata Nilai : $rata
+
+Mohon perhatian dan kerja sama Bapak/Ibu. Terima kasih.
+(Pesan dikirim otomatis oleh Sistem Absensi Siswa)
+            """.trimIndent()
+        }
+    }
+
+    private fun bukaWhatsApp(nomor: String, pesan: String) {
+        val url = "https://wa.me/$nomor?text=${URLEncoder.encode(pesan, "UTF-8")}"
+        val waIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(waIntent)
     }
 }

@@ -5,15 +5,22 @@ import android.database.Cursor
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.smk.absensikelas.R
 
-class ProfilSiswaActivity : androidx.appcompat.app.AppCompatActivity() {
+class ProfilSiswaActivity : AppCompatActivity() {
 
     private lateinit var db: DatabaseHelper
     private var idSiswa: Int = 0
     private var namaSiswa: String = "-"
+
+    private lateinit var rvOrangTuaProfil: RecyclerView
+    private lateinit var tvKosongOT: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,14 +28,12 @@ class ProfilSiswaActivity : androidx.appcompat.app.AppCompatActivity() {
 
         db = DatabaseHelper(this)
 
-        // ambil data dari intent
         idSiswa = intent.getIntExtra("id_siswa", 0)
         namaSiswa = intent.getStringExtra("nama_siswa") ?: "-"
         val nis = intent.getStringExtra("nis_siswa") ?: "-"
         val jk = intent.getStringExtra("jk_siswa") ?: "-"
         val kelas = intent.getStringExtra("nama_kelas") ?: ""
 
-        // HEADER
         findViewById<TextView>(R.id.tvNamaProfil).text = namaSiswa
         findViewById<TextView>(R.id.tvNisnProfil).text = "NISN : $nis"
         findViewById<TextView>(R.id.tvJkProfil).text = "Jenis Kelamin : $jk"
@@ -45,7 +50,6 @@ class ProfilSiswaActivity : androidx.appcompat.app.AppCompatActivity() {
             startActivity(i)
         }
 
-        // === INI YANG DIPERBAIKI ===
         findViewById<Button>(R.id.btnLihatAbsen).setOnClickListener {
             val i = Intent(this, RiwayatAbsensiActivity::class.java)
             i.putExtra("id_siswa", idSiswa)
@@ -53,7 +57,6 @@ class ProfilSiswaActivity : androidx.appcompat.app.AppCompatActivity() {
             startActivity(i)
         }
 
-        // === TABEL ABSEN ===
         val tabelAbsen = findViewById<TableLayout>(R.id.tabelAbsen)
         var hadir = 0; var izin = 0; var sakit = 0; var alpha = 0; var bolos = 0
 
@@ -79,7 +82,6 @@ class ProfilSiswaActivity : androidx.appcompat.app.AppCompatActivity() {
         tambahBarisAbsen(tabelAbsen, "BOLOS", bolos, total)
         tambahBarisAbsen(tabelAbsen, "TOTAL", total, total, true)
 
-        // === TABEL NILAI ===
         val tabelNilai = findViewById<TableLayout>(R.id.tabelNilai)
         var totalNilai = 0
         var jumlahNilai = 0
@@ -104,6 +106,110 @@ class ProfilSiswaActivity : androidx.appcompat.app.AppCompatActivity() {
         } catch (e: Exception) {
             tambahBarisNilai(tabelNilai, "RATA-RATA", 0, true)
         }
+
+        // === INISIALISASI KONTAK ORANG TUA ===
+        rvOrangTuaProfil = findViewById(R.id.rvOrangTuaProfil)
+        tvKosongOT = findViewById(R.id.tvKosongOT)
+        rvOrangTuaProfil.layoutManager = LinearLayoutManager(this)
+
+        findViewById<Button>(R.id.btnTambahOrangTua).setOnClickListener {
+            tampilkanDialogOrangTua()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        muatDataOrangTua()
+    }
+
+    private fun muatDataOrangTua() {
+        val dataModel = db.getOrangTuaBySiswa(idSiswa)
+        tvKosongOT.visibility = if (dataModel.isEmpty()) View.VISIBLE else View.GONE
+
+        val listMap = dataModel.map {
+            mapOf(
+                "id" to it.id.toString(),
+                "nama" to it.nama,
+                "no_hp" to it.noHp,
+                "status" to it.status
+            )
+        }
+
+        rvOrangTuaProfil.adapter = OrangTuaAdapter(
+            data = listMap,
+            onEditClick = { d ->
+                val editId = d["id"]?.toIntOrNull() ?: -1
+                tampilkanDialogOrangTua(editId, d)
+            },
+            onDeleteClick = { d ->
+                val id = d["id"]?.toIntOrNull() ?: return@OrangTuaAdapter
+                AlertDialog.Builder(this)
+                    .setTitle("Hapus Data")
+                    .setMessage("Hapus data ${d["status"]} atas nama ${d["nama"]}?")
+                    .setPositiveButton("Hapus") { _, _ ->
+                        if (db.deleteOrangTuaById(id) > 0) {
+                            Toast.makeText(this, "Data dihapus", Toast.LENGTH_SHORT).show()
+                            muatDataOrangTua()
+                        }
+                    }
+                    .setNegativeButton("Batal", null)
+                    .show()
+            }
+        )
+    }
+
+    private fun tampilkanDialogOrangTua(editId: Int = -1, editData: Map<String, String>? = null) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_tambah_orang_tua, null)
+        val spinnerStatus = dialogView.findViewById<Spinner>(R.id.spinnerStatusDialog)
+        val etNama = dialogView.findViewById<EditText>(R.id.etNamaDialog)
+        val etNoHp = dialogView.findViewById<EditText>(R.id.etNoHpDialog)
+
+        val listStatus = listOf("Ayah", "Ibu", "Wali")
+        spinnerStatus.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listStatus)
+
+        if (editId != -1 && editData != null) {
+            etNama.setText(editData["nama"])
+            etNoHp.setText(editData["no_hp"])
+            val pos = listStatus.indexOf(editData["status"]).takeIf { it >= 0 } ?: 0
+            spinnerStatus.setSelection(pos)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(if (editId == -1) "Tambah Orang Tua" else "Edit Orang Tua")
+            .setView(dialogView)
+            .setPositiveButton("Simpan") { _, _ ->
+                val nama = etNama.text.toString().trim()
+                val noHp = etNoHp.text.toString().trim()
+                val status = spinnerStatus.selectedItem.toString()
+
+                if (nama.isEmpty() || noHp.isEmpty()) {
+                    Toast.makeText(this, "Nama dan No HP wajib diisi!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val model = OrangTuaModel(
+                    id = editId,
+                    idSiswa = idSiswa,
+                    nama = nama,
+                    noHp = noHp,
+                    status = status
+                )
+
+                val sukses = if (editId != -1) {
+                    db.updateOrangTua(editId, model) > 0
+                } else {
+                    db.insertOrangTua(model) != -1L
+                }
+
+                if (sukses) {
+                    Toast.makeText(this, "Data berhasil disimpan", Toast.LENGTH_SHORT).show()
+                    muatDataOrangTua()
+                } else {
+                    Toast.makeText(this, "Gagal menyimpan data", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Batal", null)
+            .show()
     }
 
     private fun tambahBarisAbsen(tabel: TableLayout, ket: String, jumlah: Int, total: Int, bold: Boolean = false) {

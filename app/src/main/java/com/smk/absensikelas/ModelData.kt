@@ -56,3 +56,12 @@ data class SiswaStatistikModel(
     val persentaseHadir: Float,
     val rataNilai: Double
 )
+
+// TAMBAHKAN DI BAGIAN BAWAH FILE ModelData.kt
+data class OrangTuaModel(
+    val id: Int = 0,
+    val idSiswa: Int = 0,
+    val nama: String = "",
+    val noHp: String = "",
+    val status: String = "Ayah"
+)

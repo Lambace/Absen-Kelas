@@ -173,14 +173,14 @@
             <TextView android:layout_marginTop="25dp" android:text="Statistik Kelas" android:textSize="18sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvKelas" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
-            <!-- TOMBOL BAWAH - JARAK ATAS DIPERBAIKI -->
+            <!-- TOMBOL BAWAH - 4 TOMBOL SEJAJAR -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
-                android:weightSum="3">
+                android:weightSum="4">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnResetDB"
@@ -188,9 +188,9 @@
                     android:layout_width="0dp"
                     android:layout_height="78dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
+                    android:layout_marginEnd="4dp"
                     android:text="Reset"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:textAllCaps="false"
                     android:maxLines="1"
                     android:paddingTop="14dp"
@@ -211,9 +211,9 @@
                     android:layout_width="0dp"
                     android:layout_height="78dp"
                     android:layout_weight="1"
-                    android:layout_marginHorizontal="3dp"
+                    android:layout_marginHorizontal="2dp"
                     android:text="Backup"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:textAllCaps="false"
                     android:maxLines="1"
                     android:paddingTop="14dp"
@@ -234,9 +234,9 @@
                     android:layout_width="0dp"
                     android:layout_height="78dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginHorizontal="2dp"
                     android:text="Restore"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
                     android:textAllCaps="false"
                     android:maxLines="1"
                     android:paddingTop="14dp"
@@ -249,6 +249,30 @@
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
                     android:backgroundTint="#0288D1"
+                    app:cornerRadius="16dp" />
+
+                <!-- TOMBOL UPDATE BARU -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCekUpdate"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="78dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="Update"
+                    android:textSize="11sp"
+                    android:textAllCaps="false"
+                    android:maxLines="1"
+                    android:paddingTop="14dp"
+                    android:paddingBottom="10dp"
+                    app:icon="@android:drawable/ic_popup_sync"
+                    app:iconGravity="top"
+                    app:iconSize="24dp"
+                    app:iconPadding="6dp"
+                    app:iconTint="@android:color/white"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="#4CAF50"
                     app:cornerRadius="16dp" />
             </LinearLayout>
         </LinearLayout>

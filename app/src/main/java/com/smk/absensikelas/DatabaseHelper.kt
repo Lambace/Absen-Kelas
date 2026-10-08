@@ -4,19 +4,18 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log // FIX: tambah log
+import android.util.Log
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.PieEntry
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db", null, 14) {
+class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db", null, 15) {
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL("CREATE TABLE guru (id INTEGER PRIMARY KEY AUTOINCREMENT, nama TEXT, foto TEXT)")
         db.execSQL("CREATE TABLE kelas (id INTEGER PRIMARY KEY AUTOINCREMENT, nama_kelas TEXT, jurusan TEXT, wali_kelas TEXT, nomor_wa_wali TEXT, semester TEXT DEFAULT 'Ganjil')")
-        // PERBAIKAN: hapus UNIQUE supaya NIS boleh kosong/duplikat
         db.execSQL("CREATE TABLE siswa (id INTEGER PRIMARY KEY AUTOINCREMENT, id_kelas INTEGER, nama_siswa TEXT, nis TEXT, jenis_kelamin TEXT)")
         db.execSQL("CREATE TABLE absensi (id INTEGER PRIMARY KEY AUTOINCREMENT, id_siswa INTEGER, tanggal TEXT, status TEXT, UNIQUE(id_siswa, tanggal) ON CONFLICT REPLACE)")
         db.execSQL("CREATE TABLE nilai (id INTEGER PRIMARY KEY AUTOINCREMENT, id_siswa INTEGER, mapel TEXT, nilai INTEGER, tanggal TEXT, keterangan TEXT)")
@@ -32,10 +31,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
             UNIQUE(id_siswa, bulan, tahun)
         )
     """)
+        db.execSQL("""
+        CREATE TABLE IF NOT EXISTS orang_tua (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_siswa INTEGER,
+            nama TEXT NOT NULL,
+            no_hp TEXT,
+            status TEXT DEFAULT 'Ayah'
+        )
+    """)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // v12: tambah kolom semester
         if (oldVersion < 12) {
             try {
                 db.execSQL("ALTER TABLE kelas ADD COLUMN semester TEXT DEFAULT 'Ganjil'")
@@ -45,7 +52,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
             }
         }
 
-        // v13: tambah kolom keterangan di nilai
         if (oldVersion < 13) {
             try {
                 val cursor = db.rawQuery("PRAGMA table_info(nilai)", null)
@@ -66,13 +72,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
             }
         }
 
-        // v14: HAPUS UNIQUE di nis (ini yang bikin import gagal)
         if (oldVersion < 14) {
             try {
                 db.beginTransaction()
                 db.execSQL("DROP TABLE IF EXISTS siswa_new")
                 db.execSQL("CREATE TABLE siswa_new (id INTEGER PRIMARY KEY AUTOINCREMENT, id_kelas INTEGER, nama_siswa TEXT, nis TEXT, jenis_kelamin TEXT)")
-                // PAKAI DISTINCT dan abaikan duplikat NIS yang bikin crash
                 db.execSQL("INSERT OR IGNORE INTO siswa_new (id, id_kelas, nama_siswa, nis, jenis_kelamin) SELECT id, id_kelas, nama_siswa, nis, jenis_kelamin FROM siswa GROUP BY id")
                 db.execSQL("DROP TABLE siswa")
                 db.execSQL("ALTER TABLE siswa_new RENAME TO siswa")
@@ -82,6 +86,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
                 Log.e("DB_UPGRADE", "Migrasi gagal", e)
             } finally {
                 db.endTransaction()
+            }
+        }
+
+        // v15: tambah tabel orang tua
+        if (oldVersion < 15) {
+            try {
+                db.execSQL("""
+                CREATE TABLE IF NOT EXISTS orang_tua (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id_siswa INTEGER,
+                    nama TEXT NOT NULL,
+                    no_hp TEXT,
+                    status TEXT DEFAULT 'Ayah'
+                )
+            """)
+                Log.d("DB_UPGRADE", "Migrasi v15 sukses: tabel orang_tua dibuat")
+            } catch (e: Exception) {
+                Log.e("DB_UPGRADE", "Gagal buat tabel orang_tua", e)
             }
         }
     }
@@ -106,7 +128,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
         val list = mutableListOf<HasilCari>()
         val key = "%$keyword%"
 
-        // 1. QUERY SISWA
         db.rawQuery("""
         SELECT s.nis, s.nama_siswa, k.nama_kelas,
         IFNULL(SUM(CASE WHEN a.status='Hadir' THEN 1 ELSE 0 END)*100.0/NULLIF(COUNT(a.id),0),0),
@@ -127,7 +148,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
             }
         }
 
-        // 2. QUERY KELAS
         db.rawQuery("""
         SELECT k.id, k.nama_kelas, COUNT(DISTINCT s.id),
         IFNULL(SUM(CASE WHEN a.status='Hadir' THEN 1 ELSE 0 END)*100.0/NULLIF(COUNT(a.id),0),0),
@@ -148,7 +168,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
             }
         }
 
-        // 3. QUERY JURUSAN
         db.rawQuery("""
         SELECT SUBSTR(k.nama_kelas,4,3) as jur, COUNT(DISTINCT s.id),
         IFNULL(SUM(CASE WHEN a.status='Hadir' THEN 1 ELSE 0 END)*100.0/NULLIF(COUNT(a.id),0),0),
@@ -226,7 +245,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
     }
 
     fun insertSiswa(idKelas: Int, nama: String, nis: String?, jk: String) {
-        // kalau nis null, kita insert NULL beneran, bukan string "-"
         if (nis == null) {
             writableDatabase.execSQL(
                 "INSERT INTO siswa (id_kelas, nama_siswa, nis, jenis_kelamin) VALUES (?,?,NULL,?)",
@@ -287,7 +305,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
     }
 
     // ---- NILAI ----
-    // === NILAI ===
     fun insertNilai(idSiswa: Int, mapel: String, nilai: Int, tanggal: String, keterangan: String) {
         writableDatabase.execSQL(
             "INSERT INTO nilai (id_siswa, mapel, nilai, tanggal, keterangan) VALUES (?,?,?,?,?)",
@@ -429,7 +446,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
     fun getRiwayatAbsensiSiswa(idSiswa: Int): List<Map<String, String>> {
         val list = mutableListOf<Map<String, String>>()
         val c = readableDatabase.rawQuery(
-            "SELECT tanggal, status FROM absensi WHERE id_siswa=? ORDER BY tanggal DESC LIMIT 50", // FIX: batasi 50 biar ringan
+            "SELECT tanggal, status FROM absensi WHERE id_siswa=? ORDER BY tanggal DESC LIMIT 50",
             arrayOf(idSiswa.toString())
         )
         while (c.moveToNext()) {
@@ -448,8 +465,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
         return list
     }
 
-    // FUNGSI BARU UNTUK PROFIL SISWA - DIPERBAIKI
-    fun getStatistikSiswa(idSiswa: Int): Map<String, Int> { // FIX: ubah ke Int
+    fun getStatistikSiswa(idSiswa: Int): Map<String, Int> {
         val stats = mutableMapOf("hadir" to 0, "izin" to 0, "sakit" to 0, "alpha" to 0, "bolos" to 0)
         val c = readableDatabase.rawQuery(
             "SELECT LOWER(status), COUNT(*) FROM absensi WHERE id_siswa=? GROUP BY LOWER(status)",
@@ -464,7 +480,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
     }
 
     fun getNilaiSiswa(idSiswa: Int, jenis: String): Int {
-        // FIX: tabel kamu pakai id_siswa, mapel, keterangan - bukan siswa_id dan jenis
         val c = readableDatabase.rawQuery(
             """SELECT nilai FROM nilai
                WHERE id_siswa=? AND (UPPER(keterangan)=? OR UPPER(mapel)=?)
@@ -477,7 +492,6 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
         return hasil
     }
 
-    // FIX: fungsi baru untuk rata-rata
     fun getSemuaNilai(idSiswa: Int): List<Int> {
         val list = mutableListOf<Int>()
         val c = readableDatabase.rawQuery("SELECT nilai FROM nilai WHERE id_siswa=?", arrayOf(idSiswa.toString()))
@@ -486,4 +500,49 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, "absensi.db",
         return list
     }
 
+    // ---- ORANG TUA / WALI (BARU) ----
+    fun insertOrangTua(data: OrangTuaModel): Long {
+        val cv = ContentValues().apply {
+            put("id_siswa", data.idSiswa)
+            put("nama", data.nama)
+            put("no_hp", data.noHp)
+            put("status", data.status)
+        }
+        return writableDatabase.insert("orang_tua", null, cv)
+    }
+
+    fun updateOrangTua(id: Int, data: OrangTuaModel): Int {
+        val cv = ContentValues().apply {
+            put("id_siswa", data.idSiswa)
+            put("nama", data.nama)
+            put("no_hp", data.noHp)
+            put("status", data.status)
+        }
+        return writableDatabase.update("orang_tua", cv, "id=?", arrayOf(id.toString()))
+    }
+
+    fun getOrangTuaBySiswa(idSiswa: Int): List<OrangTuaModel> {
+        val list = mutableListOf<OrangTuaModel>()
+        val c = readableDatabase.rawQuery(
+            "SELECT id, id_siswa, nama, no_hp, status FROM orang_tua WHERE id_siswa=? ORDER BY status",
+            arrayOf(idSiswa.toString())
+        )
+        while (c.moveToNext()) {
+            list.add(
+                OrangTuaModel(
+                    id = c.getInt(0),
+                    idSiswa = c.getInt(1),
+                    nama = c.getString(2) ?: "",
+                    noHp = c.getString(3) ?: "",
+                    status = c.getString(4) ?: "Ayah"
+                )
+            )
+        }
+        c.close()
+        return list
+    }
+
+    fun deleteOrangTuaById(id: Int): Int {
+        return writableDatabase.delete("orang_tua", "id=?", arrayOf(id.toString()))
+    }
 }

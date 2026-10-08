@@ -11,8 +11,8 @@ android {
         applicationId = "com.smk.absensikelas"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.0.3"
     }
 
     buildTypes {
